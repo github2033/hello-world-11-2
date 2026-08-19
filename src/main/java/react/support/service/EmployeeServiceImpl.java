@@ -1,6 +1,7 @@
 package react.support.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -24,22 +25,18 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public List<EmployeeDto> findAll() {
-        List<Employee> employeeList = employeeRepository.findAll();
+        List<Employee> employeeList = employeeRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
         return employeeList.stream().map(EmployeeMapper::toEmployeeDto).toList();
     }
 
     @Override
     public EmployeeDto updateEmployee(Long employeeId, EmployeeDto employeeDto) {
-        if (employeeRepository.existsById(employeeId)) {
-            Employee employee = employeeRepository.findById(employeeId).get();
-            employee.setFirstName(employeeDto.getFirstName());
-            employee.setLastName(employeeDto.getLastName());
-            employee.setEmail(employeeDto.getEmail());
-            employee = employeeRepository.save(employee);
-            return EmployeeMapper.toEmployeeDto(employee);
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found : " + employeeId);
-        }
+        Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found : " + employeeId));
+        employee.setFirstName(employeeDto.getFirstName());
+        employee.setLastName(employeeDto.getLastName());
+        employee.setEmail(employeeDto.getEmail());
+        employee = employeeRepository.save(employee);
+        return EmployeeMapper.toEmployeeDto(employee);
     }
 
     @Override

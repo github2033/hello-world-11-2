@@ -5,7 +5,6 @@ import react.support.dto.EmployeeDto;
 
 import java.util.List;
 
-@Service
 public interface EmployeeService {
     public EmployeeDto findById(Long employeeId);
     public List<EmployeeDto> findAll();
